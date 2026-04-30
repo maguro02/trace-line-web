@@ -24,7 +24,9 @@ export const DEFAULT_PARAMS: AllParams = {
 export const PRESETS: PresetDef[] = [
   {
     id: "v1-balanced",
-    label: "v1 (バランス)",
+    name: "バランス",
+    tag: "v1",
+    description: "汎用的な線画向け既定値",
     preprocess: {
       morphCloseIter: 2,
       morphOpenIter: 1,
@@ -41,7 +43,9 @@ export const PRESETS: PresetDef[] = [
   },
   {
     id: "v2-corner",
-    label: "v2 (角優先・推奨)",
+    name: "角優先",
+    tag: "v2",
+    description: "ペン入れ・推奨設定",
     preprocess: {
       morphCloseIter: 1,
       morphOpenIter: 0,
@@ -58,7 +62,9 @@ export const PRESETS: PresetDef[] = [
   },
   {
     id: "v3-corner-max",
-    label: "v3 (角最大保持)",
+    name: "角最大保持",
+    tag: "v3",
+    description: "細部を最も忠実に",
     preprocess: {
       morphCloseIter: 1,
       morphOpenIter: 0,
@@ -75,7 +81,9 @@ export const PRESETS: PresetDef[] = [
   },
   {
     id: "smooth",
-    label: "滑らか優先",
+    name: "滑らか優先",
+    tag: "+",
+    description: "曲線重視・パス数低め",
     preprocess: {
       morphCloseIter: 3,
       morphOpenIter: 2,

@@ -40,11 +40,55 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        rule: "hsl(var(--rule))",
+        "rule-strong": "hsl(var(--rule-strong))",
+        vellum: {
+          DEFAULT: "hsl(var(--vellum))",
+          dim: "hsl(var(--vellum-dim))",
+        },
+        ink: {
+          1: "hsl(var(--ink-1))",
+          2: "hsl(var(--ink-2))",
+          3: "hsl(var(--ink-3))",
+        },
+        "accent-soft": "hsl(var(--accent-soft))",
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      fontFamily: {
+        sans: [
+          "Inter Tight",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "Segoe UI",
+          "Roboto",
+          "sans-serif",
+        ],
+        display: [
+          "Fraunces",
+          "Hiragino Mincho ProN",
+          "Yu Mincho",
+          "serif",
+        ],
+        mono: [
+          "JetBrains Mono",
+          "ui-monospace",
+          "SFMono-Regular",
+          "Menlo",
+          "monospace",
+        ],
+      },
+      keyframes: {
+        "pulse-soft": {
+          "0%, 100%": { opacity: "0.85" },
+          "50%": { opacity: "0.4" },
+        },
+      },
+      animation: {
+        "pulse-soft": "pulse-soft 2.4s ease-in-out infinite",
       },
     },
   },

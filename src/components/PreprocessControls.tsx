@@ -13,9 +13,9 @@ export function PreprocessControls({ params, onChange }: Props) {
     onChange({ ...params, [key]: value });
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3.5">
       <div className="flex items-center justify-between">
-        <Label className="text-sm">Otsu 自動しきい値</Label>
+        <Label className="text-[11.5px] text-vellum">Otsu 自動しきい値</Label>
         <Switch
           checked={params.useOtsu}
           onCheckedChange={(v) => set("useOtsu", v)}
@@ -54,7 +54,7 @@ export function PreprocessControls({ params, onChange }: Props) {
         onChange={(v) => set("morphOpenIter", v)}
       />
       <ParamSlider
-        label="メディアン カーネル（0=無効、偶数は奇数化）"
+        label="メディアン カーネル（0=無効）"
         value={params.medianKsize}
         min={0}
         max={9}

@@ -27,7 +27,12 @@ export interface AllParams {
 
 export interface PresetDef {
   id: string;
-  label: string;
+  /** カード上に短く表示する名前（例: "バランス"） */
+  name: string;
+  /** バッジ表示（例: "v1" "v2" "+"） */
+  tag: string;
+  /** 1 行説明文 */
+  description: string;
   preprocess: Partial<PreprocessParams>;
   vtracer: Partial<VTracerParams>;
 }
