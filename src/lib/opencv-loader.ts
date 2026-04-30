@@ -4,7 +4,9 @@ import type { PreprocessParams } from "./types";
 // public/opencv.js を Worker 内で importScripts するため、メインスレッドは
 // 巨大な WASM のパース・コンパイルからは完全に切り離される。
 
-const WORKER_URL = "/opencv-preprocess.worker.js";
+// GitHub Pages のサブパス配信に追従するため import.meta.env.BASE_URL で解決する
+// (dev では "/", prod では "/trace-line-web/")。
+const WORKER_URL = `${import.meta.env.BASE_URL}opencv-preprocess.worker.js`;
 const INIT_TIMEOUT_MS = 30_000;
 const PREPROCESS_TIMEOUT_MS = 30_000;
 

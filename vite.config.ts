@@ -5,6 +5,10 @@ import path from "node:path";
 
 // https://vite.dev/config/
 export default defineConfig({
+  // GitHub Pages では https://<user>.github.io/<repo>/ 配下に配信されるため、
+  // assets と Worker URL がリポジトリ名のサブパスで解決されるよう base を設定する。
+  // (Worker / OpenCV.js は import.meta.env.BASE_URL で参照する)
+  base: "/trace-line-web/",
   plugins: [react(), wasm()],
   resolve: {
     alias: {

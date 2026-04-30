@@ -6,7 +6,9 @@
 
 /* global cv */
 
-self.importScripts('/opencv.js');
+// 相対パスにすることで GitHub Pages のサブパス配信 (/trace-line-web/) と
+// dev サーバ (/) のどちらでも正しく opencv.js を解決できる。
+self.importScripts('./opencv.js');
 
 let ready = false;
 const queued = [];
