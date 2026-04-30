@@ -38,9 +38,12 @@ function StatusPill({
       ? "bg-emerald-400 shadow-[0_0_10px_hsl(160_70%_45%/0.7)] animate-pulse-soft"
       : "bg-amber-400 animate-pulse-soft";
   return (
-    <div className="flex items-center gap-2 rounded-full border border-rule bg-ink-1/60 px-2.5 py-1 font-mono text-[10px] tracking-[0.06em] text-muted-foreground">
+    <div
+      title={label}
+      className="flex items-center gap-2 rounded-full border border-rule bg-ink-1/60 px-1.5 py-1 font-mono text-[10px] tracking-[0.06em] text-muted-foreground sm:px-2.5"
+    >
       <span className={cn("h-1.5 w-1.5 rounded-full", dotClass)} />
-      <span>{label}</span>
+      <span className="hidden sm:inline">{label}</span>
     </div>
   );
 }
@@ -167,17 +170,90 @@ function App() {
       }
     : null;
 
+  // Section content: rendered once, placed via flex `order` on mobile and inside
+  // `<aside>` on desktop. The wrapper uses `display: contents` on mobile so its
+  // children flatten into the parent flex column, allowing the viewport to be
+  // visually inserted between the preset section and the detail-params section.
+  const inputSection = (
+    <section className="order-1 border-b border-rule px-4 py-5 lg:order-none lg:border-0 lg:p-0">
+      <SectionLabel num="01">入力画像</SectionLabel>
+      <ImageDropzone
+        current={currentSourceForDropzone}
+        onChange={({ imageData, previewUrl, fileName, fileSize }) => {
+          if (source?.previewUrl) URL.revokeObjectURL(source.previewUrl);
+          setSource({ imageData, previewUrl, fileName, fileSize });
+        }}
+      />
+      {largeImageWarning && (
+        <p className="mt-2 text-[11px] text-amber-400">{largeImageWarning}</p>
+      )}
+      {(opencv.error || vtracer.error) && (
+        <div className="mt-3 rounded border border-destructive/40 bg-destructive/10 px-3 py-2 text-[11px] text-destructive">
+          <p className="font-medium">ライブラリ読み込みに失敗しました</p>
+          {opencv.error && (
+            <p className="mt-1 break-all font-mono text-[10px] opacity-80">
+              OpenCV: {opencv.error}
+            </p>
+          )}
+          {vtracer.error && (
+            <p className="mt-1 break-all font-mono text-[10px] opacity-80">
+              vtracer: {vtracer.error}
+            </p>
+          )}
+        </div>
+      )}
+    </section>
+  );
+
+  const presetSection = (
+    <section className="order-2 border-b border-rule px-4 py-5 lg:order-none lg:border-0 lg:p-0">
+      <SectionLabel num="02">プリセット</SectionLabel>
+      <PresetSelector
+        current={params}
+        activeId={activePresetId}
+        onApply={(id, next) => {
+          setActivePresetId(id);
+          setParams(next);
+        }}
+      />
+    </section>
+  );
+
+  const detailsSection = (
+    <section className="order-4 flex flex-col gap-2.5 border-t border-rule px-4 py-5 lg:order-none lg:border-0 lg:p-0">
+      <SectionLabel num="03">詳細パラメータ</SectionLabel>
+      <Accordion title="前処理" count={8} defaultOpen={false}>
+        <PreprocessControls
+          params={params.preprocess}
+          onChange={(p) => {
+            setActivePresetId(null);
+            setParams({ ...params, preprocess: p });
+          }}
+        />
+      </Accordion>
+      <Accordion title="VTracer" count={6} defaultOpen={false}>
+        <VTracerControls
+          params={params.vtracer}
+          onChange={(p) => {
+            setActivePresetId(null);
+            setParams({ ...params, vtracer: p });
+          }}
+        />
+      </Accordion>
+    </section>
+  );
+
   return (
-    <div className="grid h-screen grid-rows-[56px_1fr_36px] overflow-hidden">
+    <div className="flex min-h-[100dvh] flex-col lg:grid lg:h-[100dvh] lg:grid-rows-[56px_1fr_36px] lg:overflow-hidden">
       {/* ───── Topbar ───── */}
-      <header className="grid grid-cols-[360px_1fr_auto] items-center border-b border-rule bg-gradient-to-b from-ink-1 to-transparent px-6">
-        <div className="flex items-center gap-3.5">
+      <header className="sticky top-0 z-20 flex h-14 items-center justify-between gap-3 border-b border-rule bg-background/85 px-4 backdrop-blur-md lg:static lg:grid lg:h-auto lg:grid-cols-[360px_1fr_auto] lg:bg-gradient-to-b lg:from-ink-1 lg:to-transparent lg:px-6 lg:backdrop-blur-0">
+        <div className="flex min-w-0 items-center gap-3">
           <BrandMark />
-          <div className="flex flex-col leading-tight">
-            <span className="font-display text-[16px] text-vellum">
+          <div className="flex min-w-0 flex-col leading-tight">
+            <span className="truncate font-display text-[14px] text-vellum lg:text-[16px]">
               線画ベクター化プレイグラウンド
             </span>
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
+            <span className="hidden font-mono text-[9px] uppercase tracking-[0.2em] text-muted-foreground lg:inline">
               trace · line · web
             </span>
           </div>
@@ -194,7 +270,7 @@ function App() {
           ]}
         />
 
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2 lg:gap-3">
           <StatusPill opencv={opencv} vtracer={vtracer} />
           <DownloadButton
             svg={pipeline.result?.svg ?? ""}
@@ -205,75 +281,20 @@ function App() {
       </header>
 
       {/* ───── Stage ───── */}
-      <div className="grid min-h-0 grid-cols-[360px_1fr]">
-        {/* Left rail */}
-        <aside className="flex flex-col gap-5 overflow-y-auto border-r border-rule bg-gradient-to-b from-ink-1 via-background to-background px-4 py-5">
-          <section>
-            <SectionLabel num="01">入力画像</SectionLabel>
-            <ImageDropzone
-              current={currentSourceForDropzone}
-              onChange={({ imageData, previewUrl, fileName, fileSize }) => {
-                if (source?.previewUrl) URL.revokeObjectURL(source.previewUrl);
-                setSource({ imageData, previewUrl, fileName, fileSize });
-              }}
-            />
-            {largeImageWarning && (
-              <p className="mt-2 text-[11px] text-amber-400">{largeImageWarning}</p>
-            )}
-            {(opencv.error || vtracer.error) && (
-              <div className="mt-3 rounded border border-destructive/40 bg-destructive/10 px-3 py-2 text-[11px] text-destructive">
-                <p className="font-medium">ライブラリ読み込みに失敗しました</p>
-                {opencv.error && (
-                  <p className="mt-1 break-all font-mono text-[10px] opacity-80">
-                    OpenCV: {opencv.error}
-                  </p>
-                )}
-                {vtracer.error && (
-                  <p className="mt-1 break-all font-mono text-[10px] opacity-80">
-                    vtracer: {vtracer.error}
-                  </p>
-                )}
-              </div>
-            )}
-          </section>
-
-          <section>
-            <SectionLabel num="02">プリセット</SectionLabel>
-            <PresetSelector
-              current={params}
-              activeId={activePresetId}
-              onApply={(id, next) => {
-                setActivePresetId(id);
-                setParams(next);
-              }}
-            />
-          </section>
-
-          <section className="flex flex-col gap-2.5">
-            <SectionLabel num="03">詳細パラメータ</SectionLabel>
-            <Accordion title="前処理" count={8} defaultOpen={false}>
-              <PreprocessControls
-                params={params.preprocess}
-                onChange={(p) => {
-                  setActivePresetId(null);
-                  setParams({ ...params, preprocess: p });
-                }}
-              />
-            </Accordion>
-            <Accordion title="VTracer" count={6} defaultOpen={false}>
-              <VTracerControls
-                params={params.vtracer}
-                onChange={(p) => {
-                  setActivePresetId(null);
-                  setParams({ ...params, vtracer: p });
-                }}
-              />
-            </Accordion>
-          </section>
+      <div className="flex flex-1 flex-col lg:grid lg:min-h-0 lg:grid-cols-[360px_1fr]">
+        {/*
+          Rail: on mobile the wrapper uses `display: contents`, so its children
+          flatten into the parent flex column. Section order is controlled per
+          child via `order-*`. On desktop, the wrapper becomes a scrollable
+          left column.
+        */}
+        <aside className="contents lg:flex lg:flex-col lg:gap-5 lg:overflow-y-auto lg:border-r lg:border-rule lg:bg-gradient-to-b lg:from-ink-1 lg:via-background lg:to-background lg:px-4 lg:py-5">
+          {inputSection}
+          {presetSection}
+          {detailsSection}
         </aside>
 
-        {/* Viewport */}
-        <main className="flex min-h-0 flex-col bg-background">
+        <main className="order-3 flex min-h-[60vh] flex-col bg-background lg:order-none lg:min-h-0">
           <PreviewGrid
             preprocessed={pipeline.result?.preprocessed ?? null}
             svg={pipeline.result?.svg ?? ""}
@@ -292,7 +313,7 @@ function App() {
 
 function BrandMark() {
   return (
-    <div className="relative h-7 w-7 overflow-hidden rounded border border-rule-strong bg-ink-2">
+    <div className="relative h-7 w-7 shrink-0 overflow-hidden rounded border border-rule-strong bg-ink-2">
       <span
         className="absolute inset-0"
         style={{
@@ -308,7 +329,7 @@ function BrandMark() {
 
 function Crumbs({ steps }: { steps: { label: string; active: boolean }[] }) {
   return (
-    <nav className="flex items-center justify-center gap-3.5 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+    <nav className="hidden items-center justify-center gap-3.5 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground lg:flex">
       {steps.map((s, i) => (
         <div key={s.label} className="flex items-center gap-3.5">
           <span className={cn("inline-flex items-center gap-2", s.active && "text-vellum")}>
@@ -340,8 +361,8 @@ function Hud({
   const preset = PRESETS.find((p) => p.id === activePresetId);
   const r = pipeline.result;
   return (
-    <footer className="grid grid-cols-[360px_1fr_auto] items-center border-t border-rule bg-ink-1 font-mono text-[10px] uppercase tracking-[0.1em]">
-      <div className="flex h-full items-center gap-3 px-4 text-muted-foreground">
+    <footer className="sticky bottom-0 z-10 grid h-9 grid-cols-[auto_1fr] items-center border-t border-rule bg-ink-1/95 font-mono text-[10px] uppercase tracking-[0.1em] backdrop-blur-md lg:static lg:grid-cols-[360px_1fr_auto] lg:bg-ink-1 lg:backdrop-blur-0">
+      <div className="hidden h-full items-center gap-3 px-4 text-muted-foreground lg:flex">
         <span className="text-[10px] tracking-[0.18em] text-muted-foreground/70">
           プリセット
         </span>
@@ -349,16 +370,25 @@ function Hud({
           {preset ? `${preset.tag} · ${preset.name}` : "カスタム"}
         </span>
       </div>
+      {/* Mobile preset cell: just show tag + name compactly */}
+      <div className="flex h-full items-center gap-2 px-3 text-muted-foreground lg:hidden">
+        <span className="text-[9px] tracking-[0.16em] text-muted-foreground/70">
+          {preset ? preset.tag : "—"}
+        </span>
+        <span className="truncate text-[10px] text-vellum">
+          {preset ? preset.name : "カスタム"}
+        </span>
+      </div>
 
-      <div className="flex h-full items-center">
+      <div className="flex h-full min-w-0 items-center overflow-x-auto">
         {pipeline.status === "running" && (
-          <span className="flex h-full items-center border-l border-rule px-4 text-accent-soft animate-pulse-soft">
-            ◇ 処理中
+          <span className="flex h-full shrink-0 items-center border-l border-rule px-3 text-accent-soft animate-pulse-soft lg:px-4">
+            ◇ <span className="ml-1 hidden sm:inline">処理中</span>
           </span>
         )}
         {pipeline.status === "error" && (
-          <span className="flex h-full items-center border-l border-rule px-4 text-destructive">
-            ✕ エラー: {pipeline.error}
+          <span className="flex h-full shrink-0 items-center border-l border-rule px-3 text-destructive lg:px-4">
+            ✕ エラー
           </span>
         )}
         {pipeline.status === "success" && r && (
@@ -369,8 +399,18 @@ function Hud({
               value={(r.stats.svgBytes / 1024).toFixed(1)}
               unit="KB"
             />
-            <Readout label="pre" value={r.timings.preprocess.toFixed(0)} unit="ms" />
-            <Readout label="vec" value={r.timings.vectorize.toFixed(0)} unit="ms" />
+            <Readout
+              label="pre"
+              value={r.timings.preprocess.toFixed(0)}
+              unit="ms"
+              hideOnMobile
+            />
+            <Readout
+              label="vec"
+              value={r.timings.vectorize.toFixed(0)}
+              unit="ms"
+              hideOnMobile
+            />
             <Readout
               label="total"
               value={r.timings.total.toFixed(0)}
@@ -378,21 +418,21 @@ function Hud({
               highlight
             />
             {r.stats.pathCount === 0 && (
-              <span className="flex h-full items-center border-l border-rule px-4 text-amber-400">
-                ⚠ 線が検出されません
+              <span className="flex h-full shrink-0 items-center border-l border-rule px-3 text-amber-400 lg:px-4">
+                ⚠ <span className="ml-1 hidden sm:inline">線が検出されません</span>
               </span>
             )}
           </>
         )}
         {pipeline.status === "idle" && (
-          <span className="flex h-full items-center border-l border-rule px-4 text-muted-foreground/60">
+          <span className="flex h-full shrink-0 items-center border-l border-rule px-3 text-muted-foreground/60 lg:px-4">
             待機中
           </span>
         )}
       </div>
 
-      <div className="flex h-full items-center gap-3.5 pr-4 text-muted-foreground">
-        <span className="hidden md:inline">
+      <div className="hidden h-full items-center gap-3.5 pr-4 text-muted-foreground lg:flex">
+        <span>
           <Kbd>1</Kbd>
           <Kbd>2</Kbd>
           <Kbd>3</Kbd>
@@ -411,14 +451,21 @@ function Readout({
   value,
   unit,
   highlight,
+  hideOnMobile,
 }: {
   label: string;
   value: string;
   unit?: string;
   highlight?: boolean;
+  hideOnMobile?: boolean;
 }) {
   return (
-    <div className="flex h-full items-center gap-2 border-l border-rule px-4">
+    <div
+      className={cn(
+        "flex h-full shrink-0 items-center gap-2 border-l border-rule px-3 lg:px-4",
+        hideOnMobile && "hidden lg:flex",
+      )}
+    >
       <span className="text-muted-foreground/60">{label}</span>
       <span className={cn("font-medium", highlight ? "text-accent-soft" : "text-vellum")}>
         {value}

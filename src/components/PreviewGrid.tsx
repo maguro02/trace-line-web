@@ -44,9 +44,9 @@ export function PreviewGrid({ preprocessed, svg, status, hasSource, ready }: Pro
 
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col">
-      <div className="flex items-center justify-between border-b border-rule px-6 py-3">
+      <div className="flex items-center justify-between gap-3 border-b border-rule px-3 py-2.5 sm:px-6 sm:py-3">
         <div
-          className="inline-flex items-center gap-1 rounded-md border border-rule bg-ink-1 p-1"
+          className="inline-flex shrink-0 items-center gap-1 rounded-md border border-rule bg-ink-1 p-1"
           role="tablist"
         >
           <ViewModeButton active={mode === "preprocess"} onClick={() => setMode("preprocess")}>
@@ -60,13 +60,13 @@ export function PreviewGrid({ preprocessed, svg, status, hasSource, ready }: Pro
           </ViewModeButton>
         </div>
 
-        <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-          <span>表示</span>
+        <div className="flex shrink-0 items-center gap-3 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+          <span className="hidden sm:inline">表示</span>
           <div className="inline-flex items-center overflow-hidden rounded border border-rule">
             <ZoomBtn onClick={zoomOut} aria="縮小">
               <Minus className="h-3.5 w-3.5" />
             </ZoomBtn>
-            <span className="grid h-7 min-w-[72px] place-items-center border-x border-rule bg-ink-2 px-2 text-vellum">
+            <span className="grid h-7 min-w-[56px] place-items-center border-x border-rule bg-ink-2 px-2 text-vellum sm:min-w-[72px]">
               {Math.round(zoom * 100)} %
             </span>
             <ZoomBtn onClick={zoomIn} aria="拡大">
@@ -131,7 +131,7 @@ export function PreviewGrid({ preprocessed, svg, status, hasSource, ready }: Pro
         )}
 
         {mode === "svg" && preprocessed && status !== "idle" && (
-          <div className="pointer-events-none absolute bottom-6 right-6 w-[160px] overflow-hidden rounded-md border border-rule bg-ink-2 shadow-2xl">
+          <div className="pointer-events-none absolute bottom-3 right-3 w-[110px] overflow-hidden rounded-md border border-rule bg-ink-2 shadow-2xl sm:bottom-6 sm:right-6 sm:w-[160px]">
             <div className="flex items-center justify-between border-b border-rule px-2 py-1.5">
               <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-muted-foreground">
                 前処理
@@ -258,7 +258,8 @@ function EmptyState({ ready, hasSource }: { ready: boolean; hasSource: boolean }
         </p>
         {ready && !hasSource && (
           <p className="mt-5 font-mono text-[11px] uppercase tracking-[0.2em] text-accent">
-            ← 左パネルから入力
+            <span className="hidden lg:inline">← 左パネルから入力</span>
+            <span className="lg:hidden">↑ 上部から画像を選択</span>
           </p>
         )}
       </div>
