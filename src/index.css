@@ -48,8 +48,9 @@
     @apply bg-background text-foreground;
     margin: 0;
     font-family: "Inter Tight", -apple-system, BlinkMacSystemFont, "Segoe UI",
-      Roboto, sans-serif;
-    font-feature-settings: "ss01", "cv11";
+      "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic UI", Meiryo,
+      "Noto Sans JP", Roboto, sans-serif;
+    font-feature-settings: "ss01", "cv11", "palt";
     background-image:
       radial-gradient(
         1200px 600px at 80% -10%,
@@ -112,10 +113,11 @@
 
 @layer utilities {
   .font-display {
-    font-family: "Fraunces", "Hiragino Mincho ProN", "Yu Mincho", serif;
-    font-variation-settings: "opsz" 24, "SOFT" 50;
-    font-weight: 400;
-    letter-spacing: -0.01em;
+    font-family: "Inter Tight", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic UI", Meiryo,
+      "Noto Sans JP", sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.015em;
   }
   .font-mono {
     font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo,
