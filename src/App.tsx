@@ -441,6 +441,24 @@ function Hud({
         <span>
           <Kbd>⌘S</Kbd> 保存
         </span>
+        <span className="flex items-center gap-2 border-l border-rule pl-3.5">
+          <a
+            href="https://github.com/maguro02/trace-line-web/blob/main/LICENSE"
+            target="_blank"
+            rel="noreferrer noopener"
+            className="hover:text-vellum"
+          >
+            MIT
+          </a>
+          <a
+            href="https://github.com/maguro02/trace-line-web/blob/main/THIRD_PARTY_NOTICES.md"
+            target="_blank"
+            rel="noreferrer noopener"
+            className="hover:text-vellum"
+          >
+            OSS
+          </a>
+        </span>
       </div>
     </footer>
   );

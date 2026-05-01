@@ -107,4 +107,6 @@ src/
 
 ## ライセンス
 
-PoC のため未設定。
+本プロジェクトは [MIT License](./LICENSE) のもとで公開されている。Copyright (c) 2026 maguro02。
+
+ビルド成果物には OpenCV.js (Apache-2.0) や vectortracer (MIT) などのサードパーティ OSS が同梱される。各依存ライブラリの著作権表示およびライセンスは [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md) を参照。
